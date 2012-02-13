@@ -1,0 +1,11 @@
+<stack>
+  <description brief="executive using teer">
+	High-level executive using teer, the task execution environment for robotics,
+	from ETHZ ASL. See http://github.com/ethz-asl/teer for details about teer.
+  </description>
+  <author>Stéphane Magnenat</author>
+  <license>BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/executive_teer</url>
+  <depend stack="ros_comm" /> 
+</stack>
