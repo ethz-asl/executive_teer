@@ -5,7 +5,11 @@ from turtlesim.msg import Pose
 
 def unit(v):
 	''' Return unitary vector of direction v '''
-	return v / np.linalg.norm(v)
+	n = np.linalg.norm(v)
+	if n != 0:
+		return v / n
+	else:
+		return v
 
 def dist(current_pose, dest_pos):
 	''' Return distance between current position and a target '''
