@@ -1,0 +1,18 @@
+<package>
+  <description brief="teer example using turtlesim">
+
+     An example of how to use teer using turtlesim.
+
+  </description>
+  <author>Stéphane Magnenat</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/teer_example_turtle</url>
+  <depend package="roslib"/>
+  <depend package="rospy"/>
+  <depend package="teer"/>
+  <depend package="turtlesim"/>
+
+</package>
+
+
