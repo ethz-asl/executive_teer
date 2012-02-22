@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<launch>
+   <node name="turtlesim" pkg="turtlesim" type="turtlesim_node"  />
+   <node name="teer_example_turtle" pkg="teer_example_turtle" type="lonely_turtle.py"  />
+</launch>
