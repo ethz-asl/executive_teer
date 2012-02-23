@@ -13,6 +13,7 @@ import rosteer
 from teer import *
 
 turtle1_velocity = None
+sched = None
 
 class TurtleScheduler(rosteer.ROSScheduler):
 	""" A teer scheduler working with ROS """
@@ -23,39 +24,37 @@ class TurtleScheduler(rosteer.ROSScheduler):
 		""" Init the ROS scheduler """
 		super(TurtleScheduler,self).__init__()
 
-def turtle1_go(sched, target):
+def turtle1_go(target):
 	""" Make turtle1 go to target, giving new speed command every second """
+	
 	while True:
 		# set new speed commands
 		turtle1_velocity.publish(control_command(sched.turtle1_pose, target))
 		# wait for 1 s
-		yield WaitDuration(1)
+		yield WaitDuration(0.5)
 
-def turtle1_task(sched):
+def turtle1_task():
 	""" Make turtle1 do a square in the environment """
 	yield WaitCondition(lambda: sched.turtle1_pose is not None)
-	
 	
 	targets = [(2,2), (8,2), (8,8), (2,8)]
 	target_id = 0
 	while True:
-		print ('Going to ' + str(targets[target_id]))
+		sched.printd('Going to ' + str(targets[target_id]))
 		target = targets[target_id]
-		go_tid =  yield NewTask(turtle1_go(sched, target))
+		go_tid =  sched.new_task(turtle1_go(target))
 		yield WaitCondition(lambda: dist(sched.turtle1_pose, target) < 0.1)
-		yield KillTask(go_tid)
+		sched.kill_task(go_tid)
 		target_id = (target_id + 1) % len(targets)
-		
+
 def turtle1_pose_updated(new_pose):
 	""" We received a new pose of turtle1 from turtlesim, update condition variable in scheduler """
-	global sched
 	sched.turtle1_pose = new_pose
 
 if __name__ == '__main__':
 	# create scheduler
-	global sched
 	sched = TurtleScheduler()
-	sched.new(turtle1_task(sched))
+	sched.new_task(turtle1_task())
 	
 	# connect to turtlesim
 	rospy.init_node('teer_example_turtle')

@@ -17,6 +17,7 @@ turtle1_velocity = None
 turtle2_velocity = None
 turtle1_set_pen = None
 turtle2_set_pen = None
+sched = None
 
 class TurtleScheduler(rosteer.ROSScheduler):
 	""" A teer scheduler working with ROS """
@@ -28,59 +29,57 @@ class TurtleScheduler(rosteer.ROSScheduler):
 		""" Init the ROS scheduler """
 		super(TurtleScheduler,self).__init__()
 
-def turtle1_go(sched, target):
+def turtle1_go(target):
 	""" Make turtle1 go to target, giving new speed command every second """
 	while True:
 		# set new speed commands
 		turtle1_velocity.publish(control_command(sched.turtle1_pose, target, 1.0))
 		# wait for 1 s
-		yield WaitDuration(1)
+		yield WaitDuration(0.5)
 
-def turtle2_go(sched, target):
-	""" Make turtle1 go to target, giving new speed command every second """
+def turtle2_go(target):
+	""" Make turtle2 go to target, giving new speed command every second """
 	while True:
 		# set new speed commands
 		turtle2_velocity.publish(control_command(sched.turtle2_pose, target, 0.7))
 		# wait for 1 s
-		yield WaitDuration(1)
+		yield WaitDuration(0.5)
 
-def turtle1_wandering(sched):
+def turtle1_wandering():
 	""" Make turtle1 do a square in the environment """
 	yield WaitCondition(lambda: sched.turtle1_pose is not None)
 	
 	targets = [(2,2), (9,2), (9,9), (2,9)]
 	target_id = 0
 	while True:
-		print ('Going to ' + str(targets[target_id]))
+		sched.printd('Going to ' + str(targets[target_id]))
 		target = targets[target_id]
-		go_tid =  yield NewTask(turtle1_go(sched, target))
+		go_tid =  sched.new_task(turtle1_go(target))
 		yield WaitCondition(lambda: dist(sched.turtle1_pose, target) < 0.1)
-		yield KillTask(go_tid)
+		sched.kill_task(go_tid)
 		target_id = (target_id + 1) % len(targets)
 
-def turtle2_wandering(sched):
+def turtle2_wandering():
 	""" Make turtle2 do a square in the environment, reverse direction as turtle1 """
 	yield WaitCondition(lambda: sched.turtle2_pose is not None)
 	
 	targets = [(2,9), (9,9), (9,2), (2,2)]
 	target_id = 0
 	while True:
-		print ('Going to ' + str(targets[target_id]))
+		sched.printd('Going to ' + str(targets[target_id]))
 		target = targets[target_id]
-		go_tid =  yield NewTask(turtle2_go(sched, target))
+		go_tid =  sched.new_task(turtle2_go(target))
 		yield WaitCondition(lambda: dist(sched.turtle2_pose, target) < 0.1)
-		yield KillTask(go_tid)
+		sched.kill_task(go_tid)
 		target_id = (target_id + 1) % len(targets)
 
 def cupidon():
 	""" When turtles are close, make them dance """
-	my_tid = yield GetTid()
+	my_tid = sched.get_current_tid()
 	while True:
 		yield  WaitCondition(lambda: dist(sched.turtle1_pose, sched.turtle2_pose) < 1)
-		print 'Found friend, let\'s dance'
-		other_tids = yield GetTids()
-		other_tids.remove(my_tid)
-		paused_tasks = yield PauseTasks(other_tids)
+		sched.printd('Found friend, let\'s dance')
+		paused_tasks = sched.pause_all_tasks_except([my_tid])
 		turtle1_set_pen(255,0,0,0,0)
 		turtle2_set_pen(0,255,0,0,0)
 		for i in range(7):
@@ -89,27 +88,24 @@ def cupidon():
 			yield WaitDuration(0.9)
 		turtle1_set_pen(0,0,0,0,1)
 		turtle2_set_pen(0,0,0,0,1)
-		print 'Tired of dancing, going back to wandering'
-		resumed_tasks = yield ResumeTasks(other_tids)
+		sched.printd('Tired of dancing, going back to wandering')
+		sched.resume_tasks(paused_tasks)
 		yield WaitDuration(10)
 
 def turtle1_pose_updated(new_pose):
 	""" We received a new pose of turtle1 from turtlesim, update condition variable in scheduler """
-	global sched
 	sched.turtle1_pose = new_pose
 
 def turtle2_pose_updated(new_pose):
 	""" We received a new pose of turtle2 from turtlesim, update condition variable in scheduler """
-	global sched
 	sched.turtle2_pose = new_pose
 
 if __name__ == '__main__':
 	# create scheduler
-	global sched
 	sched = TurtleScheduler()
-	sched.new(turtle1_wandering(sched))
-	sched.new(turtle2_wandering(sched))
-	sched.new(cupidon())
+	sched.new_task(turtle1_wandering())
+	sched.new_task(turtle2_wandering())
+	sched.new_task(cupidon())
 	
 	# connect to turtlesim
 	rospy.init_node('teer_example_turtle')
