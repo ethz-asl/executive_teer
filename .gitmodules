@@ -1,0 +1,3 @@
+[submodule "teer_ros/src/core"]
+	path = teer_ros/src/core
+	url = git://github.com/ethz-asl/teer.git
