@@ -1,8 +1,10 @@
 <package>
-  <description brief="fetches teer">
+  <description brief="ros integration of teer">
 	High-level executive using teer, the task execution environment for robotics,
-    from ETHZ ASL. See http://github.com/ethz-asl/teer for details about teer.
-	This package fetches teer and makes it available to ROS.
+    from ETHZ ASL. Teer is a Python library proposing the use of co-routines
+	(called tasks) to implement executives. Teer is an alternative to executives 
+	based on state machines such as smach. This package extends teer with
+	ROS-based time and protects teer tasks using a threading.Condition.
   </description>
   <author>Stéphane Magnenat</author>
   <license>BSD</license>

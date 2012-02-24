@@ -1,7 +1,7 @@
 <package>
   <description brief="teer example using turtlesim">
 
-     An example of how to use teer using turtlesim.
+     An example of how to use teer_ros using turtlesim.
 
   </description>
   <author>Stéphane Magnenat</author>
