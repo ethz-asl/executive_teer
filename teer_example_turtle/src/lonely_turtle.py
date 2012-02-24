@@ -9,16 +9,15 @@ from turtlesim.srv import TeleportAbsolute
 from turtlesim.srv import SetPen
 from std_srvs.srv import Empty as EmptyServiceCall
 from turtle_math import *
-import rosteer
-from teer import *
+from teer_ros import *
 
 turtle1_velocity = None
 sched = None
 
-class TurtleScheduler(rosteer.ROSScheduler):
+class TurtleScheduler(Scheduler):
 	""" A teer scheduler working with ROS """
 	
-	turtle1_pose = rosteer.ROSConditionVariable(None)
+	turtle1_pose = ConditionVariable(None)
 	
 	def __init__(self):
 		""" Init the ROS scheduler """

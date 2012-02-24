@@ -2,17 +2,21 @@
 # kate: replace-tabs off; indent-width 4; indent-mode normal
 # vim: ts=4:sw=4:noexpandtab
 
-from teer import *
+import sys
+import os
+core_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'core')
+sys.path.append(core_path)
+import teer as core
 import threading
 import rospy
 
 # ------------------------------------------------------------
 #		=== Scheduler working with ROS' time and threading ===
 # ------------------------------------------------------------
-class ROSScheduler(Scheduler):
+class Scheduler(core.Scheduler):
 	""" A scheduler supporting multi-threading access and ROS time """
 	def __init__(self):
-		super(ROSScheduler, self).__init__()
+		super(Scheduler, self).__init__()
 		self.wake_cond = threading.Condition()
 		self.running = True
 		self.in_timer_count = 0
@@ -55,10 +59,10 @@ class ROSScheduler(Scheduler):
 # ------------------------------------------------------------
 #	 === Conditional Variables working with ROS' threading ===
 # ------------------------------------------------------------
-class ROSConditionVariable(ConditionVariable):
-	""" A conditional variable working with ROSScheduler """
+class ConditionVariable(core.ConditionVariable):
+	""" A conditional variable working with ROS' Scheduler """
 	def __init__(self, initval=None):
-		super(ROSConditionVariable, self).__init__(initval)
+		super(ConditionVariable, self).__init__(initval)
 	def __get__(self, obj, objtype):
 		return self.val
 	def __set__(self, obj, val):
@@ -68,3 +72,18 @@ class ROSConditionVariable(ConditionVariable):
 		obj._test_conditions(self.myname)
 		obj.wake_cond.notify()
 		obj.wake_cond.release()
+
+# ------------------------------------------------------------
+#	             === Alias for other objects ===
+# ------------------------------------------------------------
+
+Task = core.Task
+Rate = core.Rate
+Pass = core.Pass
+GetScheduler = core.GetScheduler
+WaitTask = core.WaitTask
+WaitAnyTasks = core.WaitAllTasks
+WaitAnyTasks = core.WaitAnyTasks
+WaitDuration = core.WaitDuration
+WaitCondition = core.WaitCondition
+Sleep = core.Sleep
