@@ -11,9 +11,6 @@ from std_srvs.srv import Empty as EmptyServiceCall
 from turtle_math import *
 from teer_ros import *
 
-turtle1_velocity = None
-sched = None
-
 class TurtleScheduler(Scheduler):
 	""" A teer scheduler working with ROS """
 	
