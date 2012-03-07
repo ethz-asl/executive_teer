@@ -9,5 +9,8 @@
   <license>BSD</license>  
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/executive_teer</url>
-  <depend stack="ros_comm" /> 
+  <depend stack="ros" /> <!-- roslib -->
+  <depend stack="ros_comm" /> <!-- rospy -->
+  <depend stack="ros_tutorials" /> <!-- turtlesim -->
+
 </stack>
